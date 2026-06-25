@@ -601,6 +601,14 @@
       return;
     }
 
+    const minKg = MIN_KG[currentSlab];
+    if (actualWt <= minKg) {
+      err.style.display = 'block';
+      const slabName = currentSlab === 'general' ? 'General (Above 20 KG)' : `Pharma Above ${currentSlab} KG`;
+      err.textContent = `⚠ Weight must be above ${minKg} kg for the "${slabName}" slab. Please switch to a different slab or correct the weight.`;
+      return;
+    }
+
     const rate = RATES[currentSlab][dest];
     if (!rate) {
       err.style.display = 'block';
