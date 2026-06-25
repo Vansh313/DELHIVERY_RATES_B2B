@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delhivery Rate Calculator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #E8001D;
+    --black: #0A0A0A;
+    --white: #FFFFFF;
+    --grey-100: #F5F5F5;
+    --grey-200: #E8E8E8;
+    --grey-400: #999;
+    --grey-700: #444;
+    --green: #0AB85E;
+    --shadow: 0 4px 24px rgba(0,0,0,0.10);
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--grey-100);
+    color: var(--black);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--black);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-d { font-size: 26px; font-weight: 800; letter-spacing: -1px; color: var(--white); }
+  .logo-d span { color: var(--red); }
+  .logo-sub { font-size: 11px; color: var(--grey-400); font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; border-left: 1px solid #333; padding-left: 16px; margin-left: 4px; }
+
+  /* MAIN */
+  main {
+    max-width: 820px;
+    margin: 40px auto;
+    padding: 0 16px 60px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--black);
+  }
+  .subtitle {
+    font-size: 13px;
+    color: var(--grey-400);
+    margin-bottom: 28px;
+    font-weight: 500;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 18px;
+  }
+
+  /* FORM GRID */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--grey-700);
+    letter-spacing: 0.3px;
+  }
+
+  select, input[type="number"], input[type="text"] {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--grey-200);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: var(--black);
+    background: var(--white);
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+  select:focus, input:focus {
+    outline: none;
+    border-color: var(--red);
+  }
+
+  /* RATE TYPE PILLS */
+  .rate-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .pill {
+    flex: 1;
+    padding: 10px;
+    border: 1.5px solid var(--grey-200);
+    border-radius: 8px;
+    background: var(--white);
+    cursor: pointer;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--grey-700);
+    transition: all 0.18s;
+  }
+  .pill.active {
+    border-color: var(--red);
+    background: #fff0f2;
+    color: var(--red);
+  }
+  .pill:hover:not(.active) { border-color: #ccc; background: var(--grey-100); }
+  .pill small { display: block; font-weight: 400; color: var(--grey-400); font-size: 11px; margin-top: 2px; }
+  .pill.active small { color: #e85070; }
+
+  /* EXTRAS */
+  .extras-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--grey-200);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .check-item:hover { border-color: #bbb; }
+  .check-item input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--red);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .check-item span { font-size: 12px; font-weight: 600; color: var(--grey-700); }
+  .check-item small { font-size: 11px; color: var(--grey-400); }
+
+  /* SUBMIT */
+  .btn-calc {
+    width: 100%;
+    padding: 15px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 8px;
+  }
+  .btn-calc:hover { background: #c70018; }
+  .btn-calc:active { transform: scale(0.99); }
+
+  /* RESULT */
+  #result { display: none; }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .result-header h2 { font-size: 17px; font-weight: 700; }
+  .badge {
+    background: #edfff5;
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .price-display {
+    background: var(--black);
+    border-radius: 12px;
+    padding: 28px 24px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .price-label { font-size: 12px; color: var(--grey-400); font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .price-total { font-size: 48px; font-weight: 800; color: var(--white); line-height: 1; }
+  .price-total span { font-size: 22px; font-weight: 600; color: var(--grey-400); }
+
+  .breakdown {
+    border: 1.5px solid var(--grey-200);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--grey-200);
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row .label { color: var(--grey-700); font-weight: 500; }
+  .breakdown-row .value { font-weight: 700; color: var(--black); }
+  .breakdown-row.total-row { background: var(--grey-100); }
+  .breakdown-row.total-row .label { font-weight: 700; color: var(--black); }
+  .breakdown-row.total-row .value { color: var(--red); font-size: 15px; }
+
+  .note-row {
+    font-size: 12px;
+    color: var(--grey-400);
+    padding: 14px 16px;
+    border-top: 1px solid var(--grey-200);
+    line-height: 1.5;
+  }
+
+  .btn-reset {
+    background: none;
+    border: 1.5px solid var(--grey-200);
+    color: var(--grey-700);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.15s;
+  }
+  .btn-reset:hover { border-color: #bbb; background: var(--grey-100); }
+
+  /* ERROR */
+  .error-msg {
+    background: #fff0f2;
+    border: 1.5px solid #ffc0c8;
+    color: var(--red);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    display: none;
+    margin-top: 12px;
+  }
+
+  /* INFO NOTE */
+  .info-note {
+    background: #fffbea;
+    border: 1.5px solid #ffe88a;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #7a6000;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 580px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .extras-grid { grid-template-columns: 1fr 1fr; }
+    .price-total { font-size: 36px; }
+    header { padding: 14px 16px; }
+    .card { padding: 20px 16px; }
+    main { margin: 20px auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-d">DEL<span>H</span>IVERY</div>
+  <div class="logo-sub">Rate Calculator</div>
+</header>
+
+<main>
+  <h1>Freight Rate Calculator</h1>
+  <p class="subtitle">Surface mode · Includes 2% fuel surcharge · Effective 06 May</p>
+
+  <div class="card" id="form-card">
+    <div class="section-label">Rate Slab</div>
+
+    <div class="rate-toggle">
+      <div class="pill active" data-slab="50" onclick="selectSlab(this, '50')">
+        Above 50 KG
+        <small>Pharma Special</small>
+      </div>
+      <div class="pill" data-slab="100" onclick="selectSlab(this, '100')">
+        Above 100 KG
+        <small>Pharma Special</small>
+      </div>
+      <div class="pill" data-slab="general" onclick="selectSlab(this, 'general')">
+        Above 20 KG
+        <small>General Rates</small>
+      </div>
+    </div>
+
+    <div class="section-label">Shipment Details</div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="origin">Origin State</label>
+        <select id="origin">
+          <option value="">— Select Origin —</option>
+          <optgroup label="North India">
+            <option value="DELHI">Delhi</option>
+            <option value="UP">Uttar Pradesh</option>
+            <option value="HARYANA">Haryana</option>
+            <option value="RAJASTHAN">Rajasthan</option>
+            <option value="CHANDIGARH">Chandigarh</option>
+            <option value="PUNJAB">Punjab</option>
+            <option value="HIMACHAL">Himachal Pradesh</option>
+            <option value="UTTARAKHAND">Uttarakhand</option>
+            <option value="JK">J&K / Ladakh</option>
+          </optgroup>
+          <optgroup label="West India">
+            <option value="GUJARAT">Gujarat</option>
+            <option value="MAHARASHTRA">Maharashtra</option>
+            <option value="GOA">Goa</option>
+          </optgroup>
+          <optgroup label="Central India">
+            <option value="MP">Madhya Pradesh</option>
+            <option value="CG">Chhattisgarh</option>
+          </optgroup>
+          <optgroup label="East India">
+            <option value="WB">West Bengal</option>
+            <option value="BIHAR">Bihar</option>
+            <option value="ORISSA">Orissa</option>
+            <option value="JHARKHAND">Jharkhand</option>
+          </optgroup>
+          <optgroup label="South India">
+            <option value="KARNATAKA">Karnataka</option>
+            <option value="TAMILNADU">Tamil Nadu</option>
+            <option value="ANDHRA">Andhra Pradesh</option>
+            <option value="TELANGANA">Telangana</option>
+            <option value="KERALA">Kerala</option>
+          </optgroup>
+          <optgroup label="Northeast India">
+            <option value="SIKKIM">Sikkim</option>
+            <option value="ARUNACHAL">Arunachal Pradesh</option>
+            <option value="ASSAM">Assam</option>
+            <option value="MANIPUR">Manipur</option>
+            <option value="MEGHALAYA">Meghalaya</option>
+            <option value="MIZORAM">Mizoram</option>
+            <option value="NAGALAND">Nagaland</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="dest">Destination State</label>
+        <select id="dest">
+          <option value="">— Select Destination —</option>
+          <optgroup label="North India">
+            <option value="DELHI">Delhi</option>
+            <option value="UP">Uttar Pradesh</option>
+            <option value="HARYANA">Haryana</option>
+            <option value="RAJASTHAN">Rajasthan</option>
+            <option value="CHANDIGARH">Chandigarh</option>
+            <option value="PUNJAB">Punjab</option>
+            <option value="HIMACHAL">Himachal Pradesh</option>
+            <option value="UTTARAKHAND">Uttarakhand</option>
+            <option value="JK">J&K / Ladakh</option>
+          </optgroup>
+          <optgroup label="West India">
+            <option value="GUJARAT">Gujarat</option>
+            <option value="MAHARASHTRA">Maharashtra</option>
+            <option value="GOA">Goa</option>
+          </optgroup>
+          <optgroup label="Central India">
+            <option value="MP">Madhya Pradesh</option>
+            <option value="CG">Chhattisgarh</option>
+          </optgroup>
+          <optgroup label="East India">
+            <option value="WB">West Bengal</option>
+            <option value="BIHAR">Bihar</option>
+            <option value="ORISSA">Orissa</option>
+            <option value="JHARKHAND">Jharkhand</option>
+          </optgroup>
+          <optgroup label="South India">
+            <option value="KARNATAKA">Karnataka</option>
+            <option value="TAMILNADU">Tamil Nadu</option>
+            <option value="ANDHRA">Andhra Pradesh</option>
+            <option value="TELANGANA">Telangana</option>
+            <option value="KERALA">Kerala</option>
+          </optgroup>
+          <optgroup label="Northeast India">
+            <option value="SIKKIM">Sikkim</option>
+            <option value="ARUNACHAL">Arunachal Pradesh</option>
+            <option value="ASSAM">Assam</option>
+            <option value="MANIPUR">Manipur</option>
+            <option value="MEGHALAYA">Meghalaya</option>
+            <option value="MIZORAM">Mizoram</option>
+            <option value="NAGALAND">Nagaland</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="actual_weight">Actual Weight (KG)</label>
+        <input type="number" id="actual_weight" placeholder="e.g. 75" min="0" step="0.1">
+      </div>
+
+      <div class="form-group">
+        <label>Dimensional Weight (optional)</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
+          <input type="number" id="dim_l" placeholder="L cm" min="0">
+          <input type="number" id="dim_b" placeholder="B cm" min="0">
+          <input type="number" id="dim_h" placeholder="H cm" min="0">
+        </div>
+      </div>
+
+      <div class="form-group" id="invoice-group" style="display:none">
+        <label for="invoice_val">Invoice Value (₹) — for carrier risk</label>
+        <input type="number" id="invoice_val" placeholder="e.g. 50000" min="0">
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <div class="section-label">Additional Charges</div>
+      <div class="extras-grid">
+        <label class="check-item">
+          <input type="checkbox" id="chk_pickup"> 
+          <div><span>Pickup</span><br><small>+₹1/kg</small></div>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="chk_oda">
+          <div><span>ODA Pincode</span><br><small>+₹500</small></div>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="chk_cod">
+          <div><span>COD</span><br><small>+₹300</small></div>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" id="chk_carrier" onchange="toggleInvoice(this)">
+          <div><span>Carrier Risk</span><br id="carrier-small"><small id="carrier-pct">+0.5% invoice</small></div>
+        </label>
+      </div>
+    </div>
+
+    <div id="error-msg" class="error-msg">⚠ Please fill all required fields correctly.</div>
+    <button class="btn-calc" onclick="calculate()">Calculate Freight Cost →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="card" id="result">
+    <div class="result-header">
+      <h2>Freight Estimate</h2>
+      <span class="badge">✓ Calculated</span>
+    </div>
+
+    <div class="info-note">
+      ⚡ Includes 2% fuel surcharge on base freight. Rates are surface mode. Cash &amp; Carry.
+    </div>
+
+    <div class="price-display">
+      <div class="price-label">Total Chargeable Amount</div>
+      <div class="price-total"><span>₹</span><span id="grand-total">—</span></div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-row"><span class="label">Chargeable Weight</span><span class="value" id="br-weight">—</span></div>
+      <div class="breakdown-row"><span class="label">Rate (per KG)</span><span class="value" id="br-rate">—</span></div>
+      <div class="breakdown-row"><span class="label">Base Freight</span><span class="value" id="br-base">—</span></div>
+      <div class="breakdown-row"><span class="label">Fuel Surcharge (2%)</span><span class="value" id="br-fuel">—</span></div>
+      <div class="breakdown-row" id="br-pickup-row" style="display:none"><span class="label">Pickup Charge</span><span class="value" id="br-pickup">—</span></div>
+      <div class="breakdown-row" id="br-oda-row" style="display:none"><span class="label">ODA Charge</span><span class="value" id="br-oda">₹500</span></div>
+      <div class="breakdown-row" id="br-cod-row" style="display:none"><span class="label">COD Charge</span><span class="value" id="br-cod">₹300</span></div>
+      <div class="breakdown-row" id="br-carrier-row" style="display:none"><span class="label">Carrier Risk Charge</span><span class="value" id="br-carrier">—</span></div>
+      <div class="breakdown-row" id="br-min-row" style="display:none"><span class="label" style="color:#E8001D">⚠ Minimum charge applied</span><span class="value" id="br-min">—</span></div>
+      <div class="breakdown-row total-row"><span class="label">Grand Total</span><span class="value" id="br-total">—</span></div>
+      <div class="note-row" id="br-note"></div>
+    </div>
+
+    <button class="btn-reset" onclick="resetForm()">← Calculate Another Shipment</button>
+  </div>
+</main>
+
+<script>
+  let currentSlab = '50';
+
+  // Rate tables: state_key -> rate per kg
+  const RATES = {
+    '50': {
+      DELHI:15, UP:15, HARYANA:15, RAJASTHAN:15,
+      CHANDIGARH:16, PUNJAB:16, UTTARAKHAND:16,
+      HIMACHAL:16, // CHD/PB/UK zone
+      GUJARAT:20, // Daman/Dadra included
+      MP:24, CG:24,
+      MAHARASHTRA:26, GOA:26,
+      WB:27, BIHAR:27, ORISSA:27, JHARKHAND:27,
+      KARNATAKA:30, TAMILNADU:30,
+      ANDHRA:31, TELANGANA:31,
+      KERALA:36,
+      SIKKIM:40, ARUNACHAL:40, ASSAM:40,
+      MANIPUR:40, MEGHALAYA:40, MIZORAM:40, NAGALAND:40,
+      JK: 16 // treating as CHD/PB zone closest match
+    },
+    '100': {
+      DELHI:11, UP:11, HARYANA:11, RAJASTHAN:11,
+      CHANDIGARH:12, PUNJAB:12, UTTARAKHAND:12,
+      HIMACHAL:12, JK:12,
+      GUJARAT:15,
+      MP:18, CG:18,
+      MAHARASHTRA:19, GOA:19,
+      WB:20, BIHAR:20, ORISSA:20, JHARKHAND:20,
+      KARNATAKA:25, TAMILNADU:25,
+      ANDHRA:25, TELANGANA:25,
+      KERALA:28,
+      SIKKIM:31, ARUNACHAL:31, ASSAM:31,
+      MANIPUR:32, MEGHALAYA:32, MIZORAM:32, NAGALAND:32
+    },
+    'general': {
+      DELHI:20, UP:20, HARYANA:20, RAJASTHAN:20,
+      CHANDIGARH:21, PUNJAB:21, UTTARAKHAND:21,
+      HIMACHAL:21, JK:21,
+      GUJARAT:24,
+      MP:30, CG:32,
+      MAHARASHTRA:31, GOA:31,
+      WB:31, BIHAR:31, ORISSA:31, JHARKHAND:31,
+      KARNATAKA:33, TAMILNADU:33,
+      ANDHRA:34, TELANGANA:34,
+      KERALA:35,
+      SIKKIM:38, ARUNACHAL:38, ASSAM:38,
+      MANIPUR:38, MEGHALAYA:38, MIZORAM:38, NAGALAND:38
+    }
+  };
+
+  const MIN_CHARGE = { '50': 650, '100': 650, 'general': 450 };
+  const CARRIER_PCT = { '50': 0.5, '100': 0.5, 'general': 2.0 };
+  const MIN_KG = { '50': 50, '100': 100, 'general': 20 };
+
+  function selectSlab(el, slab) {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    currentSlab = slab;
+    // Update carrier risk label
+    document.getElementById('carrier-pct').textContent = '+' + CARRIER_PCT[slab] + '% invoice';
+  }
+
+  function toggleInvoice(cb) {
+    document.getElementById('invoice-group').style.display = cb.checked ? 'block' : 'none';
+  }
+
+  function calculate() {
+    const origin = document.getElementById('origin').value;
+    const dest = document.getElementById('dest').value;
+    const actualWt = parseFloat(document.getElementById('actual_weight').value);
+    const L = parseFloat(document.getElementById('dim_l').value) || 0;
+    const B = parseFloat(document.getElementById('dim_b').value) || 0;
+    const H = parseFloat(document.getElementById('dim_h').value) || 0;
+    const invoiceVal = parseFloat(document.getElementById('invoice_val').value) || 0;
+
+    const err = document.getElementById('error-msg');
+
+    if (!dest || !actualWt || actualWt <= 0) {
+      err.style.display = 'block';
+      err.textContent = '⚠ Please select destination and enter weight.';
+      return;
+    }
+
+    const rate = RATES[currentSlab][dest];
+    if (!rate) {
+      err.style.display = 'block';
+      err.textContent = '⚠ Rate not available for selected destination.';
+      return;
+    }
+
+    err.style.display = 'none';
+
+    // Chargeable weight: higher of actual or volumetric
+    let dimWt = 0;
+    let chargeableWt = actualWt;
+    let weightNote = '';
+    if (L > 0 && B > 0 && H > 0) {
+      dimWt = (L * B * H) / 4500;
+      chargeableWt = Math.max(actualWt, dimWt);
+      weightNote = dimWt > actualWt
+        ? `Dimensional weight (${dimWt.toFixed(2)} kg) applied — higher than actual (${actualWt} kg).`
+        : `Actual weight (${actualWt} kg) applied — higher than dimensional (${dimWt.toFixed(2)} kg).`;
+    }
+
+    const baseFreight = chargeableWt * rate;
+    const fuelSurcharge = baseFreight * 0.02;
+    const freightWithFuel = baseFreight + fuelSurcharge;
+
+    let extras = 0;
+    const pickup = document.getElementById('chk_pickup').checked;
+    const oda = document.getElementById('chk_oda').checked;
+    const cod = document.getElementById('chk_cod').checked;
+    const carrier = document.getElementById('chk_carrier').checked;
+
+    const pickupCharge = pickup ? chargeableWt * 1 : 0;
+    const odaCharge = oda ? 500 : 0;
+    const codCharge = cod ? 300 : 0;
+    const carrierCharge = carrier ? (invoiceVal * CARRIER_PCT[currentSlab] / 100) : 0;
+
+    extras = pickupCharge + odaCharge + codCharge + carrierCharge;
+
+    let total = freightWithFuel + extras;
+    const minCharge = MIN_CHARGE[currentSlab];
+    const isMinApplied = total < minCharge;
+    if (isMinApplied) total = minCharge;
+
+    // Show result
+    document.getElementById('form-card').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+
+    set('br-weight', chargeableWt.toFixed(2) + ' kg');
+    set('br-rate', '₹' + rate + '/kg (after 2% fuel: ₹' + (rate * 1.02).toFixed(2) + '/kg)');
+    set('br-base', '₹' + baseFreight.toFixed(2));
+    set('br-fuel', '₹' + fuelSurcharge.toFixed(2));
+
+    toggleRow('br-pickup-row', pickup);
+    if (pickup) set('br-pickup', '₹' + pickupCharge.toFixed(2));
+
+    toggleRow('br-oda-row', oda);
+    toggleRow('br-cod-row', cod);
+
+    toggleRow('br-carrier-row', carrier);
+    if (carrier) set('br-carrier', '₹' + carrierCharge.toFixed(2) + ' (' + CARRIER_PCT[currentSlab] + '% of ₹' + invoiceVal + ')');
+
+    toggleRow('br-min-row', isMinApplied);
+    if (isMinApplied) set('br-min', 'Min ₹' + minCharge + ' applied');
+
+    set('br-total', '₹' + Math.ceil(total).toLocaleString('en-IN'));
+    set('grand-total', Math.ceil(total).toLocaleString('en-IN'));
+
+    const slabLabel = currentSlab === 'general' ? 'General (20+ kg)' : 'Pharma (' + currentSlab + '+ kg)';
+    document.getElementById('br-note').textContent =
+      `Slab: ${slabLabel} · Surface mode · Cash & Carry · ` + (weightNote || `Actual weight used.`);
+  }
+
+  function set(id, val) { document.getElementById(id).textContent = val; }
+  function toggleRow(id, show) { document.getElementById(id).style.display = show ? 'flex' : 'none'; }
+
+  function resetForm() {
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('form-card').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
