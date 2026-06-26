@@ -381,7 +381,13 @@
     const minKg = MIN_KG[currentSlab];
     if (actualWt <= minKg) {
       err.style.display = 'block';
-      err.textContent = '⚠ Weight must be above ' + minKg + ' kg for this slab. Switch to a different slab or correct the weight.';
+      if (currentSlab === 'general') {
+        err.textContent = '⚠ This slab requires weight above 20 kg (minimum 21 kg). For lighter shipments, please contact us directly.';
+      } else if (currentSlab === '50') {
+        err.textContent = '⚠ This slab requires weight above 50 kg (minimum 51 kg). If weight is 20–50 kg, switch to "Above 20 KG" slab.';
+      } else {
+        err.textContent = '⚠ This slab requires weight above 100 kg (minimum 101 kg). If weight is 50–100 kg, switch to "Above 50 KG" slab.';
+      }
       return;
     }
     const rate = RATES[currentSlab][dest];
